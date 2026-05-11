@@ -1,4 +1,98 @@
-function BookMarkForm() {
+import { useState } from "react";
+
+function BookMarkForm({ onAdd }) {
+  const initialBookMark = {
+    id: crypto.randomUUID(),
+    url: "",
+    favColor: "#3b82f6",
+    category: "",
+    user: "",
+    pass: "",
+  };
+  const [bookmark, setBookmark] = useState(initialBookMark);
+  const [errors, setErrors] = useState({});
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setBookmark((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  }
+
+  function isValidUrl(string) {
+    try {
+      const url = new URL(string);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }
+
+  function sanitizeUrl(url) {
+    // step 1 :remove all whitespace anywhere in the string
+    let cleaned = url.replace(/\s+/g, "");
+    // step 2: if it has no protocol at all , add https://
+    if (!/^https?:\/\//i.test(cleaned)) {
+      cleaned = "https://" + cleaned;
+    }
+    return cleaned;
+  }
+
+  function handleBlur(e) {
+    const { name, value } = e.target;
+    if (name === "url") {
+      const cleaned = sanitizeUrl(value);
+      setBookmark((prev) => ({ ...prev, url: cleaned }));
+    }
+  }
+
+  function validation(bookmark) {
+    const newErrors = {};
+    // URL
+    if (!bookmark.url.trim()) {
+      newErrors.url = "URL is required";
+    } else if (!isValidUrl(bookmark.url)) {
+      newErrors.url = "Enter a valid URL including http://";
+    }
+    //Category
+    if (!bookmark.category || bookmark.category === "Select category") {
+      newErrors.category = "Please select a category";
+    }
+    //User
+    if (!bookmark.user.trim()) {
+      newErrors.user = "Username is required";
+    } else if (bookmark.user.trim().length < 3) {
+      newErrors.user = "Username must be at least 3 character";
+    }
+    //Pass
+    if (!bookmark.pass) {
+      newErrors.pass = "Password is required";
+    } else if (bookmark.pass.length < 6) {
+      newErrors.pass = "Password must be atleast 6 character";
+    }
+
+    return newErrors;
+  }
+
+  function handleAdd(e) {
+    e.preventDefault();
+
+    const newErrors = validation(bookmark);
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    onAdd(bookmark);
+  }
+
+  function handleReset(e) {
+    e.preventDefault();
+    setBookmark({ ...initialBookMark, id: crypto.randomUUID() });
+    setErrors({});
+  }
+
   return (
     <div className="max-w-7xl mx-auto mt-8 px-4">
       <form className="mb-10 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/70 to-neutral-800/40 p-8 shadow-2xl shadow-black/40 backdrop-blur">
@@ -22,6 +116,10 @@ function BookMarkForm() {
                 Website URL
               </span>
               <input
+                name="url"
+                value={bookmark.url}
+                onBlur={handleBlur}
+                onChange={handleChange}
                 type="url"
                 placeholder="https://example.com"
                 className="w-full bg-transparent text-base text-white placeholder:text-neutral-500 focus:outline-none"
@@ -29,6 +127,7 @@ function BookMarkForm() {
               <span className="text-xs text-neutral-500">
                 Include https:// for best results.
               </span>
+              {errors.url && <p className="text-red-400">{errors.url}</p>}
             </label>
 
             <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-5 text-sm transition focus-within:border-blue-500 focus-within:bg-neutral-900 focus-within:shadow-lg focus-within:shadow-blue-500/10">
@@ -42,8 +141,10 @@ function BookMarkForm() {
                   </p>
                 </div>
                 <input
+                  name="favColor"
+                  value={bookmark.favColor}
+                  onChange={handleChange}
                   type="color"
-                  value="#3b82f6"
                   className="h-12 w-12 cursor-pointer rounded-full border border-neutral-700 bg-neutral-800 p-1 shadow-inner shadow-black/50"
                 />
               </div>
@@ -59,7 +160,12 @@ function BookMarkForm() {
               <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                 Category
               </span>
-              <select className="w-full bg-transparent text-base text-white outline-none">
+              <select
+                name="category"
+                value={bookmark.category}
+                onChange={handleChange}
+                className="w-full bg-transparent text-base text-white outline-none"
+              >
                 <option className="bg-neutral-900 text-white">
                   Select category
                 </option>
@@ -79,6 +185,9 @@ function BookMarkForm() {
               <span className="text-xs text-neutral-500">
                 Helps you filter quicker later.
               </span>
+              {errors.category && (
+                <p className="text-red-400">{errors.category}</p>
+              )}
             </label>
           </div>
 
@@ -88,6 +197,9 @@ function BookMarkForm() {
                 Username
               </span>
               <input
+                name="user"
+                value={bookmark.user}
+                onChange={handleChange}
                 type="text"
                 placeholder="Enter username"
                 className="w-full bg-transparent text-base text-white placeholder:text-neutral-500 focus:outline-none"
@@ -95,6 +207,7 @@ function BookMarkForm() {
               <span className="text-xs text-neutral-500">
                 Use workspace or personal handle.
               </span>
+              {errors.user && <p className="text-red-400">{errors.user}</p>}
             </label>
 
             <label className="flex flex-col gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-5 text-sm transition focus-within:border-blue-500 focus-within:bg-neutral-900 focus-within:shadow-lg focus-within:shadow-blue-500/10">
@@ -102,6 +215,9 @@ function BookMarkForm() {
                 Password
               </span>
               <input
+                name="pass"
+                value={bookmark.pass}
+                onChange={handleChange}
                 type="password"
                 placeholder="Enter password"
                 className="w-full bg-transparent text-base text-white placeholder:text-neutral-500 focus:outline-none"
@@ -109,6 +225,7 @@ function BookMarkForm() {
               <span className="text-xs text-neutral-500">
                 Choose at least 6 characters.
               </span>
+              {errors.pass && <p className="text-red-400">{errors.pass}</p>}
             </label>
           </div>
         </div>
@@ -119,12 +236,13 @@ function BookMarkForm() {
           </div>
           <div className="flex flex-1 justify-end gap-3">
             <button
-              type="reset"
+              onClick={handleReset}
               className="w-full rounded-full border border-neutral-700 px-6 py-3 text-sm font-semibold text-neutral-200 transition hover:border-neutral-500 hover:text-white md:w-auto"
             >
               Clear
             </button>
             <button
+              onClick={handleAdd}
               type="submit"
               className="w-full rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 md:w-auto"
             >

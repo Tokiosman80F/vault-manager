@@ -17,7 +17,7 @@ function Footer() {
           </a>
         </div>
         <p className="text-xs uppercase tracking-[0.3em] text-neutral-600">
-          © Learn with Sumit — All rights reserved
+          © {new Date().getFullYear()} Learn with Sumit — All rights reserved
         </p>
       </div>
     </footer>
