@@ -1,22 +1,25 @@
 import { useState } from "react";
 
 function BookMarkGrid({ bookmarks }) {
-
-  const [toogle,setToogle]=useState(false)
+  // const [toggle, setToggle] = useState(false);
+  const [visiblePasswordId,setVisiblePasswordId]=useState(null)
 
   function getWebsiteInfo(url) {
-    const hostname = new URL(url).hostname;
-    //remove www.
-    const cleanHost = hostname.replace("www.", "");
+    try {
+      const hostname = new URL(url).hostname;
 
-    const domain = cleanHost;
-    const name = cleanHost.split(".")[0];
-    const shortName = name.slice(0, 2);
-    return { domain, name, shortName };
+      const cleanHost = hostname.replace("www.", "");
+
+      const domain = cleanHost;
+      const name = cleanHost.split(".")[0];
+      const shortName = name.slice(0, 2);
+      return { domain, name, shortName };
+    } catch {
+      return { domain: "Invalid URL", name: "Unknown", shortName: "NA" };
+    }
   }
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-  
       {bookmarks.map((bookmark) => {
         const { domain, name, shortName } = getWebsiteInfo(bookmark.url);
 
@@ -27,7 +30,13 @@ function BookMarkGrid({ bookmarks }) {
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div style={{backgroundColor:`${bookmark.favColor}20`,color:`${bookmark.favColor}`}} className="bg-blue-500/10 text-blue-400 flex h-12 w-12 items-center justify-center rounded-2xl border border-neutral-800  text-sm font-semibold uppercase ">
+                <div
+                  style={{
+                    backgroundColor: `${bookmark.favColor}20`,
+                    color: `${bookmark.favColor}`,
+                  }}
+                  className="bg-blue-500/10 text-blue-400 flex h-12 w-12 items-center justify-center rounded-2xl border border-neutral-800  text-sm font-semibold uppercase "
+                >
                   {shortName}
                 </div>
                 <div>
@@ -51,9 +60,14 @@ function BookMarkGrid({ bookmarks }) {
                   Password
                 </dt>
                 <dd className="flex items-center gap-2 text-neutral-50">
-                  <span>{ toogle ? bookmark.pass : "••••••••"}</span>
-                  <button onClick={()=>setToogle(!toogle)} className="text-xs font-semibold text-blue-400">
-                    {toogle ? "Hide":"Reveal"}
+                  <span>{visiblePasswordId===bookmark.id ? bookmark.pass : "••••••••"}</span>
+                  <button
+                    onClick={() =>setVisiblePasswordId(
+                      visiblePasswordId==bookmark.id ?null : bookmark.id
+                    )}
+                    className="text-xs font-semibold text-blue-400"
+                  >
+                    {visiblePasswordId=== bookmark.id ? "Hide" : "Reveal"}
                   </button>
                 </dd>
               </div>

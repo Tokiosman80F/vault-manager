@@ -16,7 +16,7 @@ function BookMark() {
   const [bookMarks, setBookMarks] = useState([defaultBookMark]);
   function handleAddBookmark(bookmark) {
     console.log(bookmark);
-    setBookMarks(bookMarks);
+    setBookMarks((prev)=> [...prev, bookmark]);
   }
   return (
     <div>
