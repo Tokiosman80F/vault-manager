@@ -1,4 +1,5 @@
 import { useState } from "react";
+import NotFound from "../NotFound";
 import BookMarkForm from "./BookMarkForm";
 import BookMarkGrid from "./BookMarkGrid";
 import SearchBookMark from "./SearchBookMark";
@@ -13,18 +14,35 @@ const defaultBookMark = {
 };
 
 function BookMark() {
-  const [bookMarks, setBookMarks] = useState([defaultBookMark]);
+  const [bookmarks, setBookmarks] = useState([defaultBookMark]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const displayBookmarks = bookmarks.filter((bookmark) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      bookmark.category.toLowerCase().includes(query) ||
+      bookmark.url.toLowerCase().includes(query) ||
+      bookmark.user.toLowerCase().includes(query)
+    );
+  });
+
+  console.log(displayBookmarks);
+
   function handleAddBookmark(bookmark) {
-    console.log(bookmark);
-    setBookMarks((prev)=> [...prev, bookmark]);
+    // console.log(bookmark);
+    setBookmarks((prev) => [...prev, bookmark]);
   }
   return (
     <div>
       <BookMarkForm onAdd={handleAddBookmark} />
       <main className="p-8">
         <div className="max-w-7xl mx-auto space-y-10 px-4">
-          <SearchBookMark />
-          <BookMarkGrid bookmarks={bookMarks} />
+          <SearchBookMark value={searchQuery} onChange={setSearchQuery} />
+          {bookmarks.length > 0 ? (
+            <BookMarkGrid bookmarks={displayBookmarks} />
+          ) : (
+            <NotFound />
+          )}
         </div>
       </main>
     </div>

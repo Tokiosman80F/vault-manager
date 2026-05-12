@@ -9,12 +9,12 @@ function BookMarkForm({ onAdd }) {
     user: "",
     pass: "",
   };
-  const [bookmark, setBookmark] = useState(initialBookMark);
+  const [formData, setFormData] = useState(initialBookMark);
   const [errors, setErrors] = useState({});
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setBookmark((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -43,11 +43,11 @@ function BookMarkForm({ onAdd }) {
     const { name, value } = e.target;
     if (name === "url") {
       const cleaned = sanitizeUrl(value);
-      setBookmark((prev) => ({ ...prev, url: cleaned }));
+      setFormData((prev) => ({ ...prev, url: cleaned }));
     }
   }
 
-  function validation(bookmark) {
+  function validateBookmark(bookmark) {
     const newErrors = {};
     // URL
     if (!bookmark.url.trim()) {
@@ -78,18 +78,18 @@ function BookMarkForm({ onAdd }) {
   function handleAdd(e) {
     e.preventDefault();
 
-    const newErrors = validation(bookmark);
+    const newErrors = validateBookmark(formData);
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    onAdd(bookmark);
+    onAdd(formData);
   }
 
   function handleReset(e) {
     e.preventDefault();
-    setBookmark({ ...initialBookMark, id: crypto.randomUUID() });
+    setFormData({ ...initialBookMark, id: crypto.randomUUID() });
     setErrors({});
   }
 
@@ -117,7 +117,7 @@ function BookMarkForm({ onAdd }) {
               </span>
               <input
                 name="url"
-                value={bookmark.url}
+                value={formData.url}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 type="url"
@@ -142,7 +142,7 @@ function BookMarkForm({ onAdd }) {
                 </div>
                 <input
                   name="favColor"
-                  value={bookmark.favColor}
+                  value={formData.favColor}
                   onChange={handleChange}
                   type="color"
                   className="h-12 w-12 cursor-pointer rounded-full border border-neutral-700 bg-neutral-800 p-1 shadow-inner shadow-black/50"
@@ -162,7 +162,7 @@ function BookMarkForm({ onAdd }) {
               </span>
               <select
                 name="category"
-                value={bookmark.category}
+                value={formData.category}
                 onChange={handleChange}
                 className="w-full bg-transparent text-base text-white outline-none"
               >
@@ -198,7 +198,7 @@ function BookMarkForm({ onAdd }) {
               </span>
               <input
                 name="user"
-                value={bookmark.user}
+                value={formData.user}
                 onChange={handleChange}
                 type="text"
                 placeholder="Enter username"
@@ -216,7 +216,7 @@ function BookMarkForm({ onAdd }) {
               </span>
               <input
                 name="pass"
-                value={bookmark.pass}
+                value={formData.pass}
                 onChange={handleChange}
                 type="password"
                 placeholder="Enter password"

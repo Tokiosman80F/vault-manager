@@ -2,7 +2,7 @@ import { useState } from "react";
 
 function BookMarkGrid({ bookmarks }) {
   // const [toggle, setToggle] = useState(false);
-  const [visiblePasswordId,setVisiblePasswordId]=useState(null)
+  const [visiblePasswordId, setVisiblePasswordId] = useState(null);
 
   function getWebsiteInfo(url) {
     try {
@@ -60,14 +60,20 @@ function BookMarkGrid({ bookmarks }) {
                   Password
                 </dt>
                 <dd className="flex items-center gap-2 text-neutral-50">
-                  <span>{visiblePasswordId===bookmark.id ? bookmark.pass : "••••••••"}</span>
+                  <span>
+                    {visiblePasswordId === bookmark.id
+                      ? bookmark.pass
+                      : "••••••••"}
+                  </span>
                   <button
-                    onClick={() =>setVisiblePasswordId(
-                      visiblePasswordId==bookmark.id ?null : bookmark.id
-                    )}
+                    onClick={() =>
+                      setVisiblePasswordId(
+                        visiblePasswordId == bookmark.id ? null : bookmark.id,
+                      )
+                    }
                     className="text-xs font-semibold text-blue-400"
                   >
-                    {visiblePasswordId=== bookmark.id ? "Hide" : "Reveal"}
+                    {visiblePasswordId === bookmark.id ? "Hide" : "Reveal"}
                   </button>
                 </dd>
               </div>
